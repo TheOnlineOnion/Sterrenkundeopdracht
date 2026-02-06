@@ -6,7 +6,7 @@ from matplotlib.colors import LogNorm
 from astropy.utils.data import download_file
 
 # Je moet hieronder zelf handmatig de file location veranderen naar waar jij je fits files hebt opgeslagen
-path = "C:/Users/MeintPostSecuMailerC/Documents/vnv_natuurkunde/Natuurkunde Opdracht/FITS images/dubbelcluster_overbelicht.fit"
+path = "C:/Users/MeintPostSecuMailerC/Documents/vnv_natuurkunde/Natuurkunde Opdracht/FITS images/Light_Stack_19frames_20230906_TELESCOOP1_ELISE_5DOUBLECLUSTER_5sec_Bin1_filter-R_0.5C_gain0_2023-09-06_220632.fit"
 
 informatie = fits.getheader(path)
 print(informatie)
@@ -26,18 +26,18 @@ for n in range(0, l):
 print(f"This is stacked {l} times")
 
 #Histogram om vmin en vmax te verkrijgen
-#image_hist = plt.hist(final_image.flatten(), bins="auto")
+# image_hist = plt.hist(final_image.flatten(), bins="auto")
 
 fig, axes = plt.subplots(2, 1)
 fig.set_figheight(6)
 fig.set_figwidth(6)
 
 #vmin en vmax verkegen uit de histogram
-axes[0].imshow(final_image, cmap="grey", vmin=2e3, vmax=2.5e3, origin='lower', aspect='auto') 
+axes[0].imshow(final_image, cmap="grey", vmin=0.65e3, vmax=0.75e3, origin='lower', aspect='auto') 
 
 
 #Code voor countourkaart
-cs = plt.contourf(final_image, levels=[2500, 2501], colors='red', extend='both', aspect='equal')
+cs = plt.contourf(final_image, levels=[700, 701], colors='red', extend='both', aspect='equal')
 cs.cmap.set_over('red')
 cs.cmap.set_under('blue')
 cs.changed()
