@@ -17,7 +17,7 @@ plt.style.use(astropy_mpl_style)
 
 image_data = fits.getdata('hh.fits')
 
-image_data = np.where(image_data > 2000, 10 * image_data, image_data)
+image_data = np.where(image_data > increase_boundary, intensity_increase * image_data, image_data)
 
 plt.imshow(image_data, cmap='gray')
 plt.colorbar()
