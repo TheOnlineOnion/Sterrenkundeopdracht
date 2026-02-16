@@ -24,19 +24,18 @@ image_data = ccd_image.data
 header = ccd_image.header
 
 norm_image = ImageNormalize(ccd_image, interval=AsymmetricPercentileInterval(30, 99.5))
-cmap = plt.get_cmap('viridis')
 
 # 2-D background estimation
 sigma_clip = SigmaClip(sigma=3., maxiters=5)
 bkg_estimator = MeanBackground()
-bkg = Background2D(ccd_image, box_size=80, filter_size=(9, 9), 
+bkg = Background2D(ccd_image, box_size=200, filter_size=(11, 11), 
                    mask=ccd_image.mask, sigma_clip=sigma_clip, bkg_estimator=bkg_estimator)
 
 # Calculate the 2D background subtraction, maintaining metadata, unit, and mask
 ccd_2d_bkgdsub = ccd_image.subtract(bkg.background)
 
 # Set up the figure with subplots
-fig, ax1 = plt.subplots(1, 1, figsize=(10, 10), sharey=True)
+fig, ax1 = plt.subplots(1, 1, figsize=(8, 8), sharey=True)
 plt.tight_layout()
 
 
