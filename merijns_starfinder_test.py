@@ -52,22 +52,32 @@ print(f"Found {len(sources)} sources in the image")
 positions = np.transpose((sources['xcentroid'], sources['ycentroid']))
 apertures = CircularAperture(positions, r=3 * fwhm)
 
+# De bevolkingsdichtheids diagram maken. We hebben een afbeelding van dy=3672 en dx = 5496. We maken blokjes van 51 hoog en 24 breed zodat we 72 blokjes verticaal en 229 blokjes horizontaal hebben
+image_density_map = np.zeros_like(ccd_2d_bkgdsubtr)
+for y in range(1, 73):
+    for x in range(1, 230):
+        num_stars = 0
+        for stars in positions:
+            if (x - 1) * 24 < (stars[0]) <= x * 24 and (y - 1) * 51 < (stars[1]) <= y * 51:
+                num_stars += 1
+        image_density_map[(y - 1) * 51:y * 51, (x - 1) * 24:x * 24] = num_stars
+
 # De afbeelding plotten, met colorbar
-fig, ax1 = plt.subplots(1, 1, figsize=(8, 8), sharey=True)
+fig, axes = plt.subplots(2, 1, figsize=(8, 12), sharey=True)
 plt.tight_layout()
 
 # Labels voor de assen aanmaken
-ax1.set_ylabel('Y (pixels)')
-ax1.set_xlabel('X (pixels)')
+axes[0].set_ylabel('Y (pixels)')
+axes[0].set_xlabel('X (pixels)')
 
 # De data zonder achtergrond nomralizeren en daarna plotten
 norm_image_sub = ImageNormalize(ccd_2d_bkgdsubtr, interval=AsymmetricPercentileInterval(30, 99.5))
 
-fitsplot = ax1.imshow(np.ma.masked_where(ccd_2d_bkgdsubtr.mask, ccd_2d_bkgdsubtr), norm=norm_image_sub, cmap='viridis')
-ax1.set_title('2D Background-Subtracted Data')
+fitsplot = axes[0].imshow(np.ma.masked_where(ccd_2d_bkgdsubtr.mask, ccd_2d_bkgdsubtr), norm=norm_image_sub, cmap='viridis')
+axes[0].set_title('Achtergrond Verwijderde Data, met ster detectie cirkels')
 
 # De cirkels plotten
-apertures.plot(color="red")
+apertures.plot(axes[0], color="red")
 
 # De colorbar aanmaken en op de plot plaatsen
 cbar = fig.colorbar(fitsplot, location='right', shrink=0.6)
@@ -75,4 +85,17 @@ cbar = fig.colorbar(fitsplot, location='right', shrink=0.6)
 cbar.set_label(r'Counts ({})'.format(ccd_image.unit.to_string('latex')),
                rotation=270, labelpad=30)
 
+# De bevolkingsdichtheids diagram plotten
+density = axes[1].imshow(image_density_map, cmap='viridis')
+axes[1].set_title('Bevolkingsdichtheid kaart dubbelclustert')
+axes[1].set_ylabel('Y (pixels)')
+axes[1].set_xlabel('X (pixels)')
+
+cbar2 = fig.colorbar(density, location='right', shrink=0.6)
+
+cbar2.set_label('# Stars')
+
+fig.tight_layout(pad=1)
 plt.show()
+
+print(np.shape(ccd_2d_bkgdsubtr))
