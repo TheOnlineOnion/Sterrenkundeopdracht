@@ -6,9 +6,8 @@ from astropy.nddata import CCDData
 from astropy.stats import sigma_clipped_stats, SigmaClip
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from astropy.utils.data import download_file
 from astropy.visualization import ImageNormalize, AsymmetricPercentileInterval
+import matplotlib.tri as tri
 
 import photutils as pu
 from photutils.aperture import CircularAperture
@@ -41,8 +40,8 @@ mask = np.zeros_like(ccd_2d_bkgdsubtr, dtype=bool)
 mask[:10, :] = mask[-10:, :] = mask[:, :10] = mask[:, -10:] = 1.0
 
 # We maken een object aan van de DAOStarFinder classe, met een full width half maximum van 6.2
-fwhm = 6.2
-daofinder = DAOStarFinder(threshold=6 * std, fwhm=fwhm)
+fwhm = 6.7
+daofinder = DAOStarFinder(threshold=5.8 * std, fwhm=fwhm)
 
 # Zoek nu de sterren, zonder de buitenlaag mee te nemen
 sources = daofinder(ccd_2d_bkgdsubtr.data, mask=mask)
@@ -52,19 +51,38 @@ print(f"Found {len(sources)} sources in the image")
 positions = np.transpose((sources['xcentroid'], sources['ycentroid']))
 apertures = CircularAperture(positions, r=3 * fwhm)
 
-# De bevolkingsdichtheids diagram maken. We hebben een afbeelding van dy=3672 en dx = 5496. We maken blokjes van 51 hoog en 24 breed zodat we 72 blokjes verticaal en 229 blokjes horizontaal hebben
+# De bevolkingsdichtheids diagram maken. We hebben een afbeelding van dy=3672 en dx = 5496. We maken blokjes van 51 hoog en 51 breed zodat we 72 blokjes verticaal en 107 blokjes horizontaal hebben
 image_density_map = np.zeros_like(ccd_2d_bkgdsubtr)
+small_image_density_map = np.zeros([72, 108])
 for y in range(1, 73):
-    for x in range(1, 230):
+    for x in range(1, 109):
         num_stars = 0
         for stars in positions:
-            if (x - 1) * 24 < (stars[0]) <= x * 24 and (y - 1) * 51 < (stars[1]) <= y * 51:
+            if (x - 1) * 51 < (stars[0]) <= x * 51 and (y - 1) * 51 < (stars[1]) <= y * 51:
                 num_stars += 1
-        image_density_map[(y - 1) * 51:y * 51, (x - 1) * 24:x * 24] = num_stars
+        image_density_map[(y - 1) * 51:y * 51, (x - 1) * 51:x * 51] = num_stars
+        small_image_density_map[(y-1):y, (x-1):x] = num_stars
+
+x_stars = np.linspace(0, 107, 108)
+y_stars = np.linspace(0, 71, 72)
+xv_stars, yv_stars = np.meshgrid(x_stars, y_stars)
+x_stars_flat = np.hstack(xv_stars)
+y_stars_flat = np.hstack(yv_stars)
+z_stars = small_image_density_map.flatten()
+
+stars_non_zero = np.nonzero(small_image_density_map)
+
+x_final = np.array(stars_non_zero[0])
+y_final = np.array(stars_non_zero[1])
+
+z_final = [z_stars[x] for x in np.nonzero(z_stars)][0]
+
+print(x_final, y_final, z_final)
+
 
 # De afbeelding plotten, met colorbar
-fig, axes = plt.subplots(2, 1, figsize=(8, 12), sharey=True)
-plt.tight_layout()
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+fig.tight_layout(w_pad=3)
 
 # Labels voor de assen aanmaken
 axes[0].set_ylabel('Y (pixels)')
@@ -91,11 +109,12 @@ axes[1].set_title('Bevolkingsdichtheid kaart dubbelclustert')
 axes[1].set_ylabel('Y (pixels)')
 axes[1].set_xlabel('X (pixels)')
 
-cbar2 = fig.colorbar(density, location='right', shrink=0.6)
+axes[2].plot( y_final, x_final, 'ko', ms=3)
+contour = axes[2].tricontourf(y_final, x_final, z_final, levels=5, cmap='RdBu_r')
+axes[2].set(xlim=(0, 107), ylim=(72, 0))
 
+# colorbar tweede figuur
+cbar2 = fig.colorbar(density, location='right', shrink=0.6)
 cbar2.set_label('# Stars')
 
-fig.tight_layout(pad=1)
 plt.show()
-
-print(np.shape(ccd_2d_bkgdsubtr))
