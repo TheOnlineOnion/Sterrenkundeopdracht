@@ -107,7 +107,7 @@ cbar.set_label(r'Counts ({})'.format(ccd_image.unit.to_string('latex')),
 
 # De bevolkingsdichtheids diagram plotten
 density = axes[1].imshow(image_density_map, cmap='viridis')
-axes[1].set_title('Bevolkingsdichtheid kaart dubbelclustert')
+axes[1].set_title('Bevolkingsdichtheid kaart dubbelcluster')
 axes[1].set_ylabel('Y (pixels)')
 axes[1].set_xlabel('X (pixels)')
 
