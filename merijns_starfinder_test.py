@@ -53,8 +53,8 @@ apertures = CircularAperture(positions, r=3 * fwhm)
 
 
 # De bevolkingsdichtheids diagram maken. We hebben een afbeelding van dy=3672 en dx = 5496. We maken blokjes van 102 hoog en 102 breed zodat we 72 blokjes verticaal en 107 blokjes horizontaal hebben
-size_x = 102
-size_y = 102
+size_x = 70
+size_y = 70
 
 len_x = 5496
 len_y = 3672
@@ -70,11 +70,6 @@ for y in range(1, int(len_y/size_y)+1):
         image_density_map[(y - 1) * size_y:y * size_y, (x - 1) * size_x:x * size_x] = num_stars
         small_image_density_map[(y-1):y, (x-1):x] = num_stars
 
-x_stars = np.linspace(0, int(len_x/size_x), int(len_x/size_x)+1)
-y_stars = np.linspace(0, int(len_y/size_y), int(len_y/size_y)+1)
-xv_stars, yv_stars = np.meshgrid(x_stars, y_stars)
-x_stars_flat = np.hstack(xv_stars)
-y_stars_flat = np.hstack(yv_stars)
 z_stars = small_image_density_map.flatten()
 
 stars_non_zero = np.nonzero(small_image_density_map)
@@ -120,8 +115,8 @@ axes[1].set_xlabel('X (pixels)')
 cbar2 = fig.colorbar(density, location='right', shrink=0.6)
 cbar2.set_label('# Stars')
 
-#axes[2].plot( y_final, x_final, 'ko', ms=3)
-contour = axes[2].tricontourf(y_final, x_final, z_final, levels=[0, 1.75, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], cmap='RdBu_r', antialiased=False)
+# axes[2].plot( y_final, x_final, 'k.', ms=3)
+contour = axes[2].tricontourf(y_final, x_final, z_final, levels=[0, 1.25, 2.5, 3, 5, 6], cmap='RdBu_r', antialiased=False)
 axes[2].set(xlim=(0, int(len_x/size_x)-1), ylim=(int(len_y/size_y)-1, 0))
 axes[2].set_title('Bevolkingsdichtheids contour plot dubbelcuster')
 axes[2].set_ylabel('Y (pixels)')
