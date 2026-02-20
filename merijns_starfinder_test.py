@@ -70,11 +70,6 @@ for y in range(1, int(len_y/size_y)+1):
         image_density_map[(y - 1) * size_y:y * size_y, (x - 1) * size_x:x * size_x] = num_stars
         small_image_density_map[(y-1):y, (x-1):x] = num_stars
 
-x_stars = np.linspace(0, int(len_x/size_x), int(len_x/size_x)+1)
-y_stars = np.linspace(0, int(len_y/size_y), int(len_y/size_y)+1)
-xv_stars, yv_stars = np.meshgrid(x_stars, y_stars)
-x_stars_flat = np.hstack(xv_stars)
-y_stars_flat = np.hstack(yv_stars)
 z_stars = small_image_density_map.flatten()
 
 stars_non_zero = np.nonzero(small_image_density_map)
