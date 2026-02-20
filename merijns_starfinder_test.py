@@ -121,6 +121,7 @@ axes[2].set(xlim=(0, int(len_x/size_x)-1), ylim=(int(len_y/size_y)-1, 0))
 axes[2].set_title('Bevolkingsdichtheids contour plot dubbelcuster')
 axes[2].set_ylabel('Y (pixels)')
 axes[2].set_xlabel('X (pixels)')
+axes[2].set_aspect('equal')
 
 # colorbar tweede figuur
 cbar3 = fig.colorbar(contour, location='right', shrink=0.6)
